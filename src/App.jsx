@@ -33,6 +33,9 @@ function App() {
   // Initialized as empty string.
   const[editValue, setEditValue] = useState('')
 
+  // Create a state that handles the mode we are in (Normal, Delete, Edit)
+  const[mode, setMode] = useState('normal')
+
   {/* FUNCTIONS */}
 
   // Create a function to add user input todo to todos.
@@ -58,6 +61,7 @@ function App() {
   // The correct syntax is array.filter((String, index) => index != param)
   function deleteTodo(index){
     setTodos(todos.filter((_, i) => i != index))
+    setMode('normal')
   }
 
   // Create a function to update a todo from todos.
@@ -68,6 +72,7 @@ function App() {
     setTodos(todos.map((todo, i) => i === index ? value : todo))
     setEditIndex(null)
     setEditValue('')
+    setMode('normal')
   }
 
   return (
@@ -98,31 +103,46 @@ function App() {
           Adds special syntax so that when the button is clicked it calls addTodo. */}
       <button onClick={addTodo}>Add Todo</button>
 
+      {/* Buttons to change which mode we are in */}
+      <button onClick={() => setMode('delete')}>Delete</button>
+      <button onClick={() => setMode('edit')}>Edit</button>
+
+
       {/* Display the todos list 
           Use the map method.
           Wraps delete button in an arrow function so it doesn't call the function immediately when rendering. */}
       <ul>
         {todos.map((todo, index) => (
             <li key={index}>
-              {editIndex === index ? (
-                // if it equals the index it goes into edit mode
+              {mode === "edit" ? (
+                // if it equals edit it goes into edit mode
                 <>
-                  <input
-                    value={editValue}
-                    onChange={(e) => setEditValue(e.target.value)}
-                  />
-                  <button onClick={() => updateTodo(index, editValue)}>Save</button>
+                  {editIndex === index ? (
+                    <>
+                      <input 
+                        value = {editValue} 
+                        onChange={(e) => setEditValue(e.target.value)} 
+
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') updateTodo(index, editValue)
+                        }}
+                      />
+                      <button onClick={() => updateTodo(index, editValue)}>Save</button>
+                    </>
+                  ) : (
+                    <span onClick={() => { setEditIndex(index); setEditValue(todo) }}>{todo}</span>
+                  )}
                 </>
-              ) : (
-                // if not it goes into normal mode
+              ) : mode === 'delete' ? (
+                // if not it goes into delete mode
                 <>
-                  {todo} 
-                  <button onClick={() => deleteTodo(index)}>❌</button> 
-                  <button onClick={() => {
-                    setEditIndex(index)
-                    setEditValue(todo) //pre-fill with current text
-                  }}>Edit</button>
+                  {/* Wraps todo in a clickable span. 
+                      When clicked, it calls deleteTodo with the current index, 
+                      which removes that todo from the array. */}
+                  <span onClick={() => deleteTodo(index)}>{todo}</span>
                 </>  
+              ) : (
+                <>{todo}</> // in normal mode it should just display the todo
               )}
             </li>
         ))}

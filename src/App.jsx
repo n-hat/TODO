@@ -23,7 +23,7 @@ function App() {
   // The state then renders after setInputValue is called.
   const [inputValue, setInputValue] = useState('')
 
-  // Create a function to add user input TODOS to todos.
+  // Create a function to add user input todo to todos.
   // Declares a function named addTodo with no parameters.
   // Directly accesses todos and inputValue from the component.
   // [...] creates a new array
@@ -36,6 +36,18 @@ function App() {
     setTodos([...todos, inputValue])
     setInputValue('')
   }
+
+  // Create a function that deletes a todo from todos.
+  // Takes index as a paramter and uses setTodos.
+  // Calls setTodos and sets it as a new todos with all the indexes except the parameter index.
+  // Filter method automatically returns a new array.
+  // _ is a convention that means "I don't need this parameter" - it replaces the paramter that 
+  // represents the actual string.
+  // The correct syntax is array.filter((String, index) => index != param)
+  function deleteTodo(index){
+    setTodos(todos.filter((_, i) => i != index))
+  }
+
 
   return (
     <div>
@@ -66,10 +78,13 @@ function App() {
       <button onClick={addTodo}>Add Todo</button>
 
       {/* Display the todos list 
-          Use the map method. */}
+          Use the map method.
+          Wraps delete button in an arrow function so it doesn't call the function immediately when rendering. */}
       <ul>
         {todos.map((todo, index) => (
-            <li key={index}>{todo}</li>
+            <li key={index}>
+              {todo} <button onClick={() => deleteTodo(index)}>❌</button>
+            </li>
         ))}
       </ul>
     </div>

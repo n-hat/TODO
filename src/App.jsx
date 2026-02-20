@@ -5,6 +5,8 @@ import { useState } from 'react'
 
 function App() {
 
+  {/* VARIABLES */}
+
   // Creates todos array (list of things to do).
   // The todos array starts empty.
   // setTodos is a function that is a byproduct
@@ -22,6 +24,16 @@ function App() {
   // input a value that will be stored in inputValue.
   // The state then renders after setInputValue is called.
   const [inputValue, setInputValue] = useState('')
+
+  // Tracks which todo is being edied with an editingIndex state.
+  // Initialized as null.
+  const [editIndex, setEditIndex] = useState(null)
+
+  // editValue is the value that todo is being changed to.
+  // Initialized as empty string.
+  const[editValue, setEditValue] = useState('')
+
+  {/* FUNCTIONS */}
 
   // Create a function to add user input todo to todos.
   // Declares a function named addTodo with no parameters.
@@ -48,6 +60,15 @@ function App() {
     setTodos(todos.filter((_, i) => i != index))
   }
 
+  // Create a function to update a todo from todos.
+  // Takes index as param.
+  function updateTodo(index, value){
+    // todos.map loops through each value in todos => checks if it's the index in the param.
+    // If yes replace with the value param, if not keep the current todo.
+    setTodos(todos.map((todo, i) => i === index ? value : todo))
+    setEditIndex(null)
+    setEditValue('')
+  }
 
   return (
     <div>
@@ -83,7 +104,26 @@ function App() {
       <ul>
         {todos.map((todo, index) => (
             <li key={index}>
-              {todo} <button onClick={() => deleteTodo(index)}>❌</button>
+              {editIndex === index ? (
+                // if it equals the index it goes into edit mode
+                <>
+                  <input
+                    value={editValue}
+                    onChange={(e) => setEditValue(e.target.value)}
+                  />
+                  <button onClick={() => updateTodo(index, editValue)}>Save</button>
+                </>
+              ) : (
+                // if not it goes into normal mode
+                <>
+                  {todo} 
+                  <button onClick={() => deleteTodo(index)}>❌</button> 
+                  <button onClick={() => {
+                    setEditIndex(index)
+                    setEditValue(todo) //pre-fill with current text
+                  }}>Edit</button>
+                </>  
+              )}
             </li>
         ))}
       </ul>
